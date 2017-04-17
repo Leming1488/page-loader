@@ -1,7 +1,7 @@
 install: install-deps install-flow-typed
 
 run:
-	npm run babel-node -- 'src/bin/hexlet.js' 10
+	sudo npm run babel-node -- 'src/bin/page-loader.js' --output '/var/tmp' 'https://hexlet.io/courses'
 
 install-deps:
 	yarn

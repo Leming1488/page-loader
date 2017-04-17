@@ -1,5 +1,7 @@
 // @flow
+import urlApi from 'url';
 
-import half from './half';
+export default (url, dir) => {
 
-export default half;
+};
+

@@ -1,22 +1,20 @@
 ---
+# plugins: [flowtype]
 
-plugins: [jest, flowtype]
+extends:
+  - 'airbnb-base'
+  - plugin:import/errors
+  - plugin:import/warnings
 
 env:
   node: true
   jest: true
+
+rules:
+  no-console: 0 
 
 parser: babel-eslint
 
 parserOptions:
   ecmaVersion: 2017
   sourceType: module
-
-extends:
-  - 'airbnb-base'
-  - plugin:import/errors
-  - plugin:import/warnings
-  - plugin:flowtype/recommended
-
-rules:
-  no-console: 0
