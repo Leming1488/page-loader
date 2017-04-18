@@ -14,7 +14,7 @@ build:
 	npm run build
 
 test:
-	npm test
+	npm test -- --coverage
 
 test-watch:
 	sudo npm test -- --watch
