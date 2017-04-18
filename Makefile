@@ -25,6 +25,10 @@ check-types:
 lint:
 	npm run eslint -- src test
 
+link:
+	make build
+	npm link
+
 publish:
 	npm publish
 
