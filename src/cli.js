@@ -8,8 +8,7 @@ export default () => {
     .description('Download page to a current directory')
     .option('-o, --output [dir]', 'Output directory')
     .action((url) => {
-      pageLoader(url, app.output);
-      console.log(`${url} ${app.output}`);
+      console.log(pageLoader(url, app.output));
     })
     .parse(process.argv);
 };
