@@ -1,4 +1,5 @@
 import app from 'commander';
+import pageLoader from './';
 
 export default () => {
   app
@@ -7,7 +8,7 @@ export default () => {
     .description('Download page to a current directory')
     .option('-o, --output [dir]', 'Output directory')
     .action((url) => {
-      console.log(`${url} ${app.output}`);
+      console.log(pageLoader(url, app.output));
     })
     .parse(process.argv);
 };

@@ -16,6 +16,9 @@ build:
 test:
 	npm test
 
+test-watch:
+	sudo npm test -- --watch
+
 check-types:
 	npm run flow
 
