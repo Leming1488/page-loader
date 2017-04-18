@@ -11,43 +11,47 @@ import pageLoader from '../src';
 const host = 'https://localhost';
 const address = `${host}${path.sep}index`;
 const tmpDir = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
-const testDir = fs.mkdtempSync(`${path.resolve(__dirname, './__fixture__/')}${path.sep}`);
+const page = fs.readFileSync(path.resolve('./__tests__/__fixtures__/', 'test-page.html'));
+const defaultDir = path.resolve('./src/localhost-index.html');
 
 const testPage =
 `<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Test page</title>
-<body>
-  <h1>Test</h1>
-</body>
-</html>`;
+  <head>
+    <meta charset="utf-8">
+    <title>Test page</title>
+  </head>
+  <body>
+    <h1>Test</h1>
+  </body>
+</html>
+`;
 
 axios.defaults.host = host;
 axios.defaults.adapter = httpAdapter;
 
-beforeEach(() => {
-  nock(host)
-    .get('/index')
-    .reply(200, testPage);
-});
+describe('page-loader', () => {
+  beforeEach(() => {
+    nock(host)
+      .get('/index')
+      .reply(200, page);
+  });
 
-afterAll(() => {
-  rimraf(tmpDir, () => console.log('clear tmpDir'));
-  rimraf(testDir, () => console.log('clear testDir'));
-});
+  afterAll(() => {
+    rimraf(tmpDir, () => console.log('clear tmpDir'));
+    rimraf(defaultDir, () => console.log('clear defaultDir'));
+  });
 
-test('Download page from url to a current directory', () => {
-  console.log(tmpDir);
-  return Promise.resolve(pageLoader(address, tmpDir))
+  test('Download page from url to a current directory', () => (
+    Promise.resolve(pageLoader(address, tmpDir))
     .then(() => fs.readFile(`${tmpDir}${path.sep}localhost-index.html`, 'utf8'))
-    .then(date => expect(date).toBe(testPage));
+    .then(date => expect(date).toBe(testPage))
+  ));
+
+  test('Download page from url to a directory by default', () => (
+    Promise.resolve(pageLoader(address))
+    .then(() => fs.readFile(defaultDir, 'utf8'))
+    .then(date => expect(date).toBe(testPage))
+  ));
 });
 
-test('Download page from url to a directory by default', () => {
-  console.log(testDir);
-  return Promise.resolve(pageLoader(address, testDir))
-    .then(() => fs.readFile(`${testDir}${path.sep}localhost-index.html`, 'utf8'))
-    .then(date => expect(date).toBe(testPage));
-});
