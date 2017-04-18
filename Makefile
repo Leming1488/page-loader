@@ -1,7 +1,7 @@
 install: install-deps install-flow-typed
 
 run:
-	sudo npm run babel-node -- 'src/bin/page-loader.js' --output '/var/tmp' 'https://hexlet.io/courses'
+	sudo npm run babel-node -- 'src/bin/page-loader.js'  'https://hexlet.io/courses'
 
 install-deps:
 	yarn
@@ -17,13 +17,17 @@ test:
 	npm test -- --coverage
 
 test-watch:
-	sudo npm test -- --watch
+	npm test -- --watch
 
 check-types:
 	npm run flow
 
 lint:
 	npm run eslint -- src test
+
+link:
+	make build
+	npm link
 
 publish:
 	npm publish

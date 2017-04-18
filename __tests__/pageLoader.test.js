@@ -12,7 +12,7 @@ const host = 'https://localhost';
 const address = `${host}${path.sep}index`;
 const tmpDir = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
 const page = fs.readFileSync(path.resolve('./__tests__/__fixtures__/', 'test-page.html'));
-const defaultDir = path.resolve('./src/localhost-index.html');
+const defaultDir = path.resolve('./localhost-index.html');
 
 const testPage =
 `<!doctype html>

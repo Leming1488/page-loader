@@ -1,6 +1,6 @@
 {
   "name": "page-loader",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "page-loader from CLI",
   "main": "dist/index.js",
   "bin": {
