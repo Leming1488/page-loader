@@ -16,6 +16,14 @@
     "build": "NODE_ENV=production babel src --out-dir dist --source-maps inline",
     "prepublish": "npm run build"
   },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/__fixtures__/"
+    ],
+    "coverageDirectory": "./",
+    "coverageReporters":  ["json", "lcov", "text"]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Leming1488/page-loader.git"
