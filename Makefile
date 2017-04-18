@@ -17,7 +17,7 @@ test:
 	npm test -- --coverage
 
 test-watch:
-	sudo npm test -- --watch
+	npm test -- --watch
 
 check-types:
 	npm run flow

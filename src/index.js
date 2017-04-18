@@ -12,7 +12,7 @@ export default (url, directory = './') => {
     name: fileName,
     ext: '.html',
   });
-  fs.stat(directory)
+  return fs.stat(directory)
   .then(stats => (stats.isDirectory ? axios.get(url) : new Error('Directory does not exist')))
   .then(res => fs.writeFile(filePath, `${res.data}`, 'utf8'))
   .then(() => console.log('succesfully written'))
