@@ -4,14 +4,21 @@ import os from 'os';
 import nock from 'nock';
 import path from 'path';
 import rimraf from 'rimraf';
+import url from 'url';
 // import fsReaddirR from '../src/lib/fs-readdir-r';
 import axiosHttpAdapter from '../src/lib/aixosHttpAdapter';
 import pageLoader from '../src';
 
 const host = 'https://localhost';
 axiosHttpAdapter(host);
-const address = `${host}${path.sep}index`;
-const defaultDir = path.resolve('./localhost-index.html');
+const address = url.resolve(host, 'test');
+const defaultDir = path.resolve('./localhost-test.html');
+const testDir = './__tests__/__fixtures__/';
+const assetsPath = 'localhost-test_files/';
+const assetsPathTest = 'assets/';
+const cssPath = 'index.css';
+const jsPath = 'index.js';
+const imgPath = 'icon-warning.png';
 
 const testPage =
 `<!doctype html>
@@ -19,32 +26,37 @@ const testPage =
   <head>
     <meta charset="utf-8">
     <title>Test page</title>
-    <script src="/assets/js/index.js"></script>
-    <script src="/assets/js/vendor/jquery.js"></script>
-    <link href="/assets/css/index.css" rel="stylesheet"/>
+    <script src="${assetsPath}${jsPath}"></script>
+    <link href="${assetsPath}${cssPath}" rel="stylesheet">
   </head>
   <body>
     <h1 class="text-center">Download</h1>
-    <img alt="img1" src="/assets/img/logo-background-1.jpg"/>
-    <img alt="img2" src="/assets/img/logo-background-2.jpg"/>
-    <img alt="img3" src="/assets/img/logo-background-3.jpg"/>
-    <a  href="#"><img alt="photo" src="/assets/img/icon-photo.png"/></a>
-    <p>You are probably looking for either jsdom , jquery or cheerio. <img alt="warning" src="/assets/img/icon-warning.png"/>  What you are doing is called screen scraping, extracting data from a site. jsdom/jquery offer complete set of tools but cheerio is much faster </p>
+    <a href="#"><img alt="photo" src="${assetsPath}${imgPath}"></a>
   </body>
 </html>
 `;
 
 
 describe('page-loader', () => {
-  const tmpDir = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
-  const page = fs.readFileSync(path.resolve('./__tests__/__fixtures__/', 'test-page.html'));
+  const getAssets = name => fs.readFileSync(path.resolve(testDir, assetsPathTest, name));
+  let tmpDir;
+  let page;
 
-  // const assetsPath = './__tests__/__fixtures__/assets/';
+  beforeAll(() => {
+    tmpDir = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
+    page = fs.readFileSync(path.resolve(testDir, 'test-page.html'));
+  });
 
   beforeEach(() => {
     nock(host)
-      .get('/index')
-      .reply(200, page);
+      .get('/test')
+      .reply(200, page)
+      .get(`/test/${assetsPathTest}/${cssPath}`)
+      .reply(200, getAssets(cssPath))
+      .get(`/test/${assetsPathTest}/${jsPath}`)
+      .reply(200, getAssets(jsPath))
+      .get(`/test/${assetsPathTest}/${imgPath}`)
+      .reply(200, getAssets(imgPath));
   });
 
   afterAll(() => {
@@ -53,31 +65,23 @@ describe('page-loader', () => {
   });
 
   test('Download page from url to a current directory', (done) => {
-    function callback() {
-      fs.readFile(`${tmpDir}${path.sep}localhost-index.html`, 'utf8')
+    pageLoader(address, tmpDir)
+      .then(() => fs.readFile(path.join(tmpDir, 'localhost-test.html'), 'utf8'))
       .then((data) => {
         expect(data).toBe(testPage);
         done();
       })
-      .catch((e) => {
-        done.fail(e);
-      });
-    }
-    pageLoader(address, tmpDir, callback);
+      .catch(done.fail);
   });
 
   test('Download page from url to a directory by default', (done) => {
-    function callback() {
-      fs.readFile(defaultDir, 'utf8')
+    pageLoader(address)
+      .then(() => fs.readFile(defaultDir, 'utf8'))
       .then((data) => {
         expect(data).toBe(testPage);
         done();
       })
-      .catch((e) => {
-        done.fail(e);
-      });
-    }
-    pageLoader(address, undefined, callback);
+      .catch(done.fail);
   });
 
   // test('Download assets', (done) => {
