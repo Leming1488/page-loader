@@ -7,7 +7,7 @@ import cheerio from 'cheerio';
 
 export default (url, directory = './') => {
   const parsedUrl = urlApi.parse(url);
-  const fileName = `${parsedUrl.hostname}${parsedUrl.pathname}`.replace(/[^A-Za-z0-9]/g, '-');
+  const fileName = path.join(parsedUrl.hostname, parsedUrl.pathname).replace(/[^A-Za-z0-9]/g, '-');
   const assetsDir = `${fileName}_files`;
   let assetsLinkList = [];
   const nodeList = [
@@ -26,13 +26,19 @@ export default (url, directory = './') => {
       const $ = cheerio.load(res.data);
       nodeList.forEach((node) => {
         $(node.selector).each((index, item) => {
-          assetsLinkList = [...assetsLinkList, $(item).attr(node.attr)];
+          assetsLinkList = [...assetsLinkList, path.basename($(item).attr(node.attr))];
           $(item).attr(node.attr, path.join(assetsDir, path.basename($(item).attr(node.attr))));
         });
       });
-      console.log(assetsLinkList);
-      const requestList = assetsLinkList.map(link => axios.get(`${url}${link}`));
-      Promise.all()
+      // const dir = fs.mkdirSync(assetsDir);
+      const requestList = assetsLinkList.map(link => (
+        axios({
+          method: 'get',
+          url: url + '/' + assetsDir + '/' + link,
+          // repsonseType: 'stream',
+        }).then(data => fs.writeFile(assetsDir + '/' + link, data, 'utf8'))
+      ));
+      Promise.all(requestList).then(value => console.log(value), error => console.log(error));
       return fs.writeFile(filePath, $.html(), 'utf8');
     })
     .then(() => 'succesfully written');

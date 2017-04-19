@@ -14,11 +14,11 @@ axiosHttpAdapter(host);
 const address = url.resolve(host, 'test');
 const defaultDir = path.resolve('./localhost-test.html');
 const testDir = './__tests__/__fixtures__/';
-const assetsPath = 'localhost-test_files/';
+const assetsPath = 'localhost-test_files';
 const assetsPathTest = 'assets/';
 const cssPath = 'index.css';
 const jsPath = 'index.js';
-const imgPath = 'icon-warning.png';
+const imgPath = 'icon-photo.png';
 
 const testPage =
 `<!doctype html>
@@ -51,11 +51,11 @@ describe('page-loader', () => {
     nock(host)
       .get('/test')
       .reply(200, page)
-      .get(`/test/${assetsPathTest}/${cssPath}`)
+      .get(`/test/${assetsPath}/${cssPath}`)
       .reply(200, getAssets(cssPath))
-      .get(`/test/${assetsPathTest}/${jsPath}`)
+      .get(`/test/${assetsPath}/${jsPath}`)
       .reply(200, getAssets(jsPath))
-      .get(`/test/${assetsPathTest}/${imgPath}`)
+      .get(`/test/${assetsPath}/${imgPath}`)
       .reply(200, getAssets(imgPath));
   });
 
