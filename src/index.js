@@ -14,10 +14,7 @@ export default (url, directory = './', callback) => {
   });
   fs.stat(directory)
   .then(stats => (stats.isDirectory ? axios.get(url) : new Error('Directory does not exist')))
-    .then(res => {
-      // console.log(res.data);
-      return fs.writeFile(filePath, res.data, 'utf8');
-    })
+    .then(res => fs.writeFile(filePath, res.data, 'utf8'))
     .then(() => callback('succesfully written'))
   .catch(e => e);
 };
