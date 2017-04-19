@@ -4,6 +4,7 @@ import os from 'os';
 import nock from 'nock';
 import path from 'path';
 import rimraf from 'rimraf';
+// import fsReaddirR from '../src/lib/fs-readdir-r';
 import axiosHttpAdapter from '../src/lib/aixosHttpAdapter';
 import pageLoader from '../src';
 
@@ -38,12 +39,7 @@ describe('page-loader', () => {
   const tmpDir = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
   const page = fs.readFileSync(path.resolve('./__tests__/__fixtures__/', 'test-page.html'));
 
-  const assetsPath = './__tests__/__fixtures__/assets/';
-  const ner = fs.readdir(assetsPath)
-    .then(nodes => Promise.all(nodes.reduce((acc, dir) => [...acc, fs.readdir(assetsPath + dir)], [])))
-    .then((list) => {
-      console.log(list.join(','));
-    });
+  // const assetsPath = './__tests__/__fixtures__/assets/';
 
   beforeEach(() => {
     nock(host)
@@ -84,19 +80,19 @@ describe('page-loader', () => {
     pageLoader(address, undefined, callback);
   });
 
-  test('Download assets', (done) => {
-    function callback() {
-      fs.readdir(assetsPath)
-      .then(nodes => Promise.all(nodes.reduce((acc, dir) => [...acc, fs.readdir(`${assetsPath}${dir}`)], [])))
-      .then((list) => {
-        expect(list.join(',')).toBe(' ');
-        done();
-      })
-      .catch((e) => {
-        done.fail(e);
-      });
-    }
-    pageLoader(address, tmpDir, callback);
-  });
+  // test('Download assets', (done) => {
+  //   function callback() {
+  //     fsReaddirR(assetsPath)
+  //       .then((files) => {
+  //         const list = files.reduce((acc, file) => [...acc, path.basename(file)], []).join(',');
+  //         expect(list).toBe('index.css');
+  //         done();
+  //       })
+  //     .catch((e) => {
+  //       done.fail(e);
+  //     });
+  //   }
+  //   pageLoader(address, tmpDir, callback);
+  // });
 });
 

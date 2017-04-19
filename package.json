@@ -22,7 +22,11 @@
       "/__fixtures__/"
     ],
     "coverageDirectory": "./",
-    "coverageReporters":  ["json", "lcov", "text"]
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text"
+    ]
   },
   "repository": {
     "type": "git",
@@ -38,6 +42,7 @@
     "axios": "^0.16.1",
     "commander": "^2.9.0",
     "mz": "^2.6.0",
+    "recursive-readdir": "^2.1.1",
     "rimraf": "^2.6.1"
   },
   "devDependencies": {
