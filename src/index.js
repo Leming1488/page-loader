@@ -14,9 +14,9 @@ export default (url, directory = './') => {
   let assetsLinkList = [];
 
   const nodeList = [
-    { selector: 'img', attr: 'src' },
-    { selector: 'script', attr: 'src' },
-    { selector: 'link', attr: 'href' },
+    { selector: 'img[src]', attr: 'src' },
+    { selector: 'script[src]', attr: 'src' },
+    { selector: 'link[href]', attr: 'href' },
   ];
   const filePath = path.format({
     dir: directory,
@@ -30,14 +30,14 @@ export default (url, directory = './') => {
     const $ = cheerio.load(res.data);
     nodeList.forEach((node) => {
       $(node.selector).each((index, item) => {
-        assetsLinkList = [...assetsLinkList, path.basename($(item).attr(node.attr))];
+        assetsLinkList = [...assetsLinkList, $(item).attr(node.attr)];
         $(item).attr(node.attr, path.join(assetsDir, path.basename($(item).attr(node.attr))));
       });
     });
     mkdirExist(path.join(directory, assetsDir));
     const requestList = assetsLinkList.map(link => (
-      axios({ method: 'get', url: `${url}/${assetsDir}/${link}`, responseType: 'arraybuffer' })
-      .then(response => fs.writeFile(path.join(directory, assetsDir, link), response.data, 'utf8'))
+      axios({ method: 'get', url: urlApi.resolve(url, link), responseType: 'arraybuffer' })
+        .then(response => fs.writeFile(path.join(directory, assetsDir, path.basename(link)), response.data, 'utf8'))
     ));
     return Promise.all(requestList, fs.writeFile(filePath, $.html(), 'utf8'));
   })
