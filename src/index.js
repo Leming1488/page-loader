@@ -24,7 +24,7 @@ export default (url, directory = './') => {
   });
 
   return fs.stat(directory)
-  .then(stats => (stats.isDirectory ? fs.mkdirSync(path.join(directory, assetsDir)) : new Error('Directory does not exist')))
+  .then(stats => (stats.isDirectory ? fs.mkdir(path.join(directory, assetsDir)) : new Error('Directory does not exist')))
   .then(() => axios.get(url))
   .then((res) => {
     const $ = cheerio.load(res.data);
