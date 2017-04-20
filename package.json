@@ -42,6 +42,7 @@
     "axios": "^0.16.1",
     "cheerio": "^0.22.0",
     "commander": "^2.9.0",
+    "debug": "^2.6.3",
     "mz": "^2.6.0",
     "recursive-readdir": "^2.1.1",
     "rimraf": "^2.6.1"

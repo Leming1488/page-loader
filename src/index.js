@@ -6,7 +6,13 @@ import path from 'path';
 import cheerio from 'cheerio';
 import fileNameFromUrl from './lib/fileNameFromUrl';
 
+const debug = require('debug')('page-loader');
+
 export default (url, directory = './') => {
+  debug(
+  `  start pageLoader
+  directory: ${directory}
+  url: ${url}`);
   const mkdirExist = dir => fs.existsSync(dir) || fs.mkdirSync(dir);
   const parsedUrl = urlApi.parse(url);
   const fileName = fileNameFromUrl(parsedUrl.hostname, parsedUrl.pathname);
@@ -35,10 +41,11 @@ export default (url, directory = './') => {
       });
     });
     mkdirExist(path.join(directory, assetsDir));
-    const requestList = assetsLinkList.map(link => (
-      axios({ method: 'get', url: urlApi.resolve(url, link), responseType: 'arraybuffer' })
-        .then(response => fs.writeFile(path.join(directory, assetsDir, path.basename(link)), response.data, 'utf8'))
-    ));
+    const requestList = assetsLinkList.map((link) => {
+      debug(link);
+      return axios({ method: 'get', url: urlApi.resolve(url, link), responseType: 'arraybuffer' })
+        .then(response => fs.writeFile(path.join(directory, assetsDir, path.basename(link)), response.data, 'utf8'));
+    });
     return Promise.all(requestList, fs.writeFile(filePath, $.html(), 'utf8'));
   })
   .then(() => 'succesfully written');
