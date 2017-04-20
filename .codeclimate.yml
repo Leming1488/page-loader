@@ -1,4 +1,4 @@
 exclude_paths:
-- "__tests__/__fixtures__/"
-- "dist"
-- "/node_modules/"
+- "__fixtures__/"
+- "dist/"
+- "node_modules/"
