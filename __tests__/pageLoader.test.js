@@ -5,11 +5,11 @@ import nock from 'nock';
 import path from 'path';
 import rimraf from 'rimraf';
 import url from 'url';
-import axiosHttpAdapter from '../src/lib/aixosHttpAdapter';
+import axios from '../src/lib/axios';
 import pageLoader from '../src';
 
 const host = 'https://localhost';
-axiosHttpAdapter(host);
+axios(host);
 const address = url.resolve(host, 'test');
 const testDir = './__tests__/__fixtures__/';
 const assetsPath = 'localhost-test_files';
