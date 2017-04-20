@@ -9,7 +9,6 @@ import axios from '../src/lib/axios';
 import pageLoader from '../src';
 
 const host = 'https://localhost';
-axios(host);
 const address = url.resolve(host, 'test');
 const testDir = './__tests__/__fixtures__/';
 const assetsPath = 'localhost-test_files';
@@ -41,6 +40,7 @@ describe('page-loader', () => {
   let page;
 
   beforeAll(() => {
+    axios(host);
     tmpDir = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
     page = fs.readFileSync(path.resolve(testDir, 'test-page.html'));
   });

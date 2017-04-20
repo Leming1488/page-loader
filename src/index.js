@@ -4,21 +4,14 @@ import fs from 'mz/fs';
 import axios from 'axios';
 import path from 'path';
 import cheerio from 'cheerio';
-import fileNameFromUrl from './lib/fileNameFromUrl';
+import debug from './lib/debug';
+import getFileNameFromUrl from './lib/getFileNameFromUrl';
 
-const debug = require('debug')('page-loader');
 
 export default (url, directory = './') => {
-  debug(
-  `  start pageLoader
-  directory: ${directory}
-  url: ${url}`);
-  const mkdirExist = dir => fs.existsSync(dir) || fs.mkdirSync(dir);
   const parsedUrl = urlApi.parse(url);
-  const fileName = fileNameFromUrl(parsedUrl.hostname, parsedUrl.pathname);
+  const fileName = getFileNameFromUrl(parsedUrl.hostname, parsedUrl.pathname);
   const assetsDir = `${fileName}_files`;
-  let assetsLinkList = [];
-
   const nodeList = [
     { selector: 'img[src]', attr: 'src' },
     { selector: 'script[src]', attr: 'src' },
@@ -31,23 +24,32 @@ export default (url, directory = './') => {
   });
 
   return fs.stat(directory)
-  .then(stats => (stats.isDirectory ? axios.get(url) : new Error('Directory does not exist')))
+  .then(stats => (stats.isDirectory ? fs.mkdirSync(path.join(directory, assetsDir)) : new Error('Directory does not exist')))
+  .then(() => axios.get(url))
   .then((res) => {
     const $ = cheerio.load(res.data);
-    nodeList.forEach((node) => {
-      $(node.selector).each((index, item) => {
-        assetsLinkList = [...assetsLinkList, $(item).attr(node.attr)];
-        $(item).attr(node.attr, path.join(assetsDir, path.basename($(item).attr(node.attr))));
+    const links = nodeList.reduce((acc, node) => {
+      const src = $(node.selector).map((index, item) => {
+        const attr = $(item).attr(node.attr);
+        $(item).attr(node.attr, path.join(assetsDir, path.basename(attr)));
+        return attr;
       });
-    });
-    mkdirExist(path.join(directory, assetsDir));
-    const requestList = assetsLinkList.map((link) => {
-      debug(link);
-      return axios({ method: 'get', url: urlApi.resolve(url, link), responseType: 'arraybuffer' })
-        .then(response => fs.writeFile(path.join(directory, assetsDir, path.basename(link)), response.data, 'utf8'));
-    });
-    return Promise.all(requestList, fs.writeFile(filePath, $.html(), 'utf8'));
+      return [...acc, src.get().join('')];
+    }, []);
+    const html = $.html();
+    return { html, links };
   })
+  .then((page) => {
+    debug(page);
+    const htmlFile = fs.writeFile(filePath, page.html, 'utf8');
+    const assetsData = page.links.map(link => axios({ method: 'get', url: urlApi.resolve(url, link), responseType: 'arraybuffer' }));
+    return Promise.all(assetsData, htmlFile);
+  })
+  .then(responses => (
+     Promise.all(responses.map(res => (
+      fs.writeFile(path.join(directory, assetsDir, path.basename(res.request.path)), res.data, 'utf8')
+    )))
+   ))
   .then(() => 'succesfully written');
 };
 

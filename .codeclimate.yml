@@ -1,4 +1,7 @@
+JavaScript: true
+Ruby: true
+Python: false
+PHP: false
+
 exclude_paths:
-- "__fixtures__/"
-- "dist/"
-- "node_modules/"
+- __tests__/__fixtures__/**/*

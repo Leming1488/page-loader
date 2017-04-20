@@ -17,7 +17,7 @@ test:
 	DEBUG=page-loader npm test -- --coverage
 
 test-watch:
-	sudo DEBUG=page-loader npm test -- --watch
+	DEBUG=page-loader npm test -- --watch
 
 check-types:
 	npm run flow
