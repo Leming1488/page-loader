@@ -36,13 +36,9 @@ export default (url, directory = './') => {
       });
       return [...acc, src.get().join('')];
     }, []);
-    const html = $.html();
-    return { html, links };
-  })
-  .then((page) => {
-    debug(page);
-    const htmlFile = fs.writeFile(filePath, page.html, 'utf8');
-    const assetsData = page.links.map(link => axios({ method: 'get', url: urlApi.resolve(url, link), responseType: 'arraybuffer' }));
+    debug(links);
+    const htmlFile = fs.writeFile(filePath, $.html(), 'utf8');
+    const assetsData = links.map(link => axios({ method: 'get', url: urlApi.resolve(url, link), responseType: 'arraybuffer' }));
     return Promise.all(assetsData, htmlFile);
   })
   .then(responses => (
