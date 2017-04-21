@@ -9,8 +9,14 @@ import getFileNameFromUrl from './lib/getFileNameFromUrl';
 
 
 export default (url, directory = './') => {
-  const parsedUrl = urlApi.parse(url);
-  const fileName = getFileNameFromUrl(parsedUrl.hostname, parsedUrl.pathname);
+  let parsedUrl;
+  let fileName;
+  try {
+    parsedUrl = urlApi.parse(url);
+    fileName = getFileNameFromUrl(parsedUrl.hostname, parsedUrl.pathname);
+  } catch (e) {
+    throw e;
+  }
   const assetsDir = `${fileName}_files`;
   const nodeList = [
     { selector: 'img[src]', attr: 'src' },
@@ -22,9 +28,13 @@ export default (url, directory = './') => {
     name: fileName,
     ext: '.html',
   });
-
   return fs.stat(directory)
-  .then(stats => (stats.isDirectory ? fs.mkdir(path.join(directory, assetsDir)) : new Error('Directory does not exist')))
+  .then(stats => new Promise((resolve, reject) => {
+    if (stats.isDirectory) {
+      return resolve(fs.mkdir(path.join(directory, assetsDir)));
+    }
+    return reject(new Error(`Directory ${directory} does not exist`));
+  }))
   .then(() => axios.get(url))
   .then((res) => {
     const $ = cheerio.load(res.data);
@@ -34,7 +44,7 @@ export default (url, directory = './') => {
         $(item).attr(node.attr, path.join(assetsDir, path.basename(attr)));
         return attr;
       });
-      return [...acc, src.get().join('')];
+      return [...acc, ...src.get()];
     }, []);
     debug(links);
     const htmlFile = fs.writeFile(filePath, $.html(), 'utf8');

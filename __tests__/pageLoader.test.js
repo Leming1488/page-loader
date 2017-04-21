@@ -10,6 +10,7 @@ import pageLoader from '../src';
 
 const host = 'https://localhost';
 const address = url.resolve(host, 'test');
+const addressErrorHttp = url.resolve(host, 'errorHttp');
 const testDir = './__tests__/__fixtures__/';
 const assetsPath = 'localhost-test_files';
 const assetsPathTest = 'assets';
@@ -54,11 +55,31 @@ describe('page-loader', () => {
       .get(`/${assetsPathTest}/${jsPath}`)
       .reply(200, getAssets(jsPath))
       .get(`/${assetsPathTest}/${imgPath}`)
-      .reply(200, getAssets(imgPath));
+      .reply(200, getAssets(imgPath))
+      .get('/errorHttp')
+      .reply(500);
   });
 
   afterAll(() => {
     rimraf(tmpDir, () => console.log('clear tmpDir'));
+  });
+
+  test('Test wrong http response', (done) => {
+    pageLoader(addressErrorHttp, tmpDir)
+      .then(() => done.fail())
+      .catch(e => done(e));
+  });
+
+  test('Test fs error', (done) => {
+    pageLoader(addressErrorHttp, null)
+      .then(() => done.fail())
+      .catch(e => done(e));
+  });
+
+  test('Test bad url', () => {
+    expect(() => {
+      pageLoader(null, tmpDir);
+    }).toThrow();
   });
 
   test('Download page from url to a current directory', (done) => {
