@@ -17,8 +17,8 @@ export default () => {
           })
           .catch((e) => {
             if (e.response) {
-              console.error(chalk.red.bold(`non-200 response status code: ${e.response.status}/n
-                          for url: ${e.response.request.path}`));
+              console.error(chalk.red.bold(`${e.response.status}/n Url: ${e.response.request.path}`));
+              return process.exit(1);
             }
             console.error(chalk.yellow.bold(`${e}`));
             return process.exit(1);
