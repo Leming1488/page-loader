@@ -22,7 +22,7 @@ export default () => {
         return tasks.run()
           .then((ctx) => {
             console.log(chalk.green.bold(ctx.res));
-            process.exit(0);
+            return process.exit(0);
           })
           .catch((e) => {
             if (e.response) {
