@@ -1,5 +1,6 @@
 import app from 'commander';
 import chalk from 'chalk';
+import Listr from 'listr';
 import pageLoader from './';
 
 export default () => {
@@ -10,10 +11,18 @@ export default () => {
     .option('-o, --output [dir]', 'Output directory')
     .action((url) => {
       try {
-        return pageLoader(url, app.output)
-          .then((state) => {
-            console.log(chalk.green.bold(state));
-            return process.exit(0);
+        const tasks = new Listr([
+          {
+            title: 'Upload Page',
+            /*eslint-disable */
+            task: (ctx) => pageLoader(url, app.output).then(res => (ctx.res = res)),
+            /*eslint-enable */
+          },
+        ]);
+        return tasks.run()
+          .then((ctx) => {
+            console.log(chalk.green.bold(ctx.res));
+            process.exit(0);
           })
           .catch((e) => {
             if (e.response) {
