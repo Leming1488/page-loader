@@ -9,14 +9,8 @@ import getFileNameFromUrl from './lib/getFileNameFromUrl';
 
 
 export default (url, directory = './') => {
-  let parsedUrl;
-  let fileName;
-  try {
-    parsedUrl = urlApi.parse(url);
-    fileName = getFileNameFromUrl(parsedUrl.hostname, parsedUrl.pathname);
-  } catch (e) {
-    throw e;
-  }
+  const parsedUrl = urlApi.parse(url);
+  const fileName = getFileNameFromUrl(parsedUrl.hostname, parsedUrl.pathname);
   const assetsDir = `${fileName}_files`;
   const nodeList = [
     { selector: 'img[src]', attr: 'src' },
@@ -29,12 +23,12 @@ export default (url, directory = './') => {
     ext: '.html',
   });
   return fs.stat(directory)
-  .then(stats => new Promise((resolve, reject) => {
+  .then((stats) => {
     if (stats.isDirectory) {
-      return resolve(fs.mkdir(path.join(directory, assetsDir)));
+      return fs.mkdir(path.join(directory, assetsDir));
     }
-    return reject(new Error(`Directory ${directory} does not exist`));
-  }))
+    return Promise.reject(new Error(`Directory ${directory} does not exist`));
+  })
   .then(() => axios.get(url))
   .then((res) => {
     const $ = cheerio.load(res.data);
