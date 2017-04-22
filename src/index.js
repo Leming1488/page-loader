@@ -9,14 +9,8 @@ import getFileNameFromUrl from './lib/getFileNameFromUrl';
 
 
 export default (url, directory = './') => {
-  let parsedUrl;
-  let fileName;
-  try {
-    parsedUrl = urlApi.parse(url);
-    fileName = getFileNameFromUrl(parsedUrl.hostname, parsedUrl.pathname);
-  } catch (e) {
-    throw e;
-  }
+  const parsedUrl = urlApi.parse(url);
+  const fileName = getFileNameFromUrl(parsedUrl.hostname, parsedUrl.pathname);
   const assetsDir = `${fileName}_files`;
   const nodeList = [
     { selector: 'img[src]', attr: 'src' },
