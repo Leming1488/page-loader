@@ -7,11 +7,14 @@ import cheerio from 'cheerio';
 import debug from './lib/debug';
 import getFileNameFromUrl from './lib/getFileNameFromUrl';
 
-
-export default (url, directory = './') => {
+export default (url, directory = './', ctx = null) => {
+  /*eslint-disable */
+  const listr = (obj, data) => (obj ? obj.assets = data : null);
+  /*eslint-enable */
   const parsedUrl = urlApi.parse(url);
   const fileName = getFileNameFromUrl(parsedUrl.hostname, parsedUrl.pathname);
   const assetsDir = `${fileName}_files`;
+
   const nodeList = [
     { selector: 'img[src]', attr: 'src' },
     { selector: 'script[src]', attr: 'src' },
@@ -22,6 +25,7 @@ export default (url, directory = './') => {
     name: fileName,
     ext: '.html',
   });
+
   return fs.stat(directory)
   .then((stats) => {
     if (stats.isDirectory) {
@@ -40,9 +44,10 @@ export default (url, directory = './') => {
       });
       return [...acc, ...src.get()];
     }, []);
-    debug(links);
     const htmlFile = fs.writeFile(filePath, $.html(), 'utf8');
     const assetsData = links.map(link => axios({ method: 'get', url: urlApi.resolve(url, link), responseType: 'arraybuffer' }));
+    debug(links);
+    listr(ctx, links);
     return Promise.all(assetsData, htmlFile);
   })
   .then(responses => (
@@ -50,6 +55,6 @@ export default (url, directory = './') => {
       fs.writeFile(path.join(directory, assetsDir, path.basename(res.request.path)), res.data, 'utf8')
     )))
    ))
-  .then(() => 'succesfully written');
+  .then(() => `Succesfully written in ${directory}`);
 };
 
