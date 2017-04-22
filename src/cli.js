@@ -13,10 +13,18 @@ export default () => {
       try {
         const tasks = new Listr([
           {
-            title: 'Upload Page',
-            /*eslint-disable */
-            task: (ctx) => pageLoader(url, app.output).then(res => (ctx.res = res)),
-            /*eslint-enable */
+            title: `Upload Page from ${url}`,
+            task: () =>
+              new Listr([
+                {
+                  title: 'Load assets',
+                  /*eslint-disable */
+                  task: ctx => pageLoader(url, app.output, ctx)
+                  .then(res => ctx.res = res)
+                    .then(() => ctx.assets.forEach(link => console.log(chalk.green(` ✔${' '.repeat(3)}${link}`)))),
+                  /*eslint-enable */
+                },
+              ]),
           },
         ]);
         return tasks.run()
