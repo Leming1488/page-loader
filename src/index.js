@@ -23,12 +23,12 @@ export default (url, directory = './') => {
     ext: '.html',
   });
   return fs.stat(directory)
-  .then(stats => new Promise((resolve, reject) => {
+  .then((stats) => {
     if (stats.isDirectory) {
-      return resolve(fs.mkdir(path.join(directory, assetsDir)));
+      return fs.mkdir(path.join(directory, assetsDir));
     }
-    return reject(new Error(`Directory ${directory} does not exist`));
-  }))
+    return Promise.reject(new Error(`Directory ${directory} does not exist`));
+  })
   .then(() => axios.get(url))
   .then((res) => {
     const $ = cheerio.load(res.data);
