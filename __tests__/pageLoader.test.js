@@ -66,14 +66,14 @@ describe('page-loader', () => {
 
   test('Test wrong http response', (done) => {
     pageLoader(addressErrorHttp, tmpDir)
-      .then(() => done.fail())
-      .catch(e => done(e));
+      .then(done.fail)
+      .catch(done);
   });
 
   test('Test fs error', (done) => {
     pageLoader(addressErrorHttp, null)
-      .then(() => done.fail())
-      .catch(e => done(e));
+      .then(done.fail)
+      .catch(done);
   });
 
   test('Test bad url', () => {
@@ -84,7 +84,6 @@ describe('page-loader', () => {
 
   test('Download page from url to a current directory', (done) => {
     pageLoader(address, tmpDir)
-    .then(rezult => expect(rezult).toBe(`Succesfully written in ${tmpDir}`))
     .then(() => fs.readdir(path.join(tmpDir, assetsPath), 'utf8'))
     .then((data) => {
       expect(data.join('')).toBe(fs.readdirSync(path.join(testDir, assetsPathTest)).join(''));
