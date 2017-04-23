@@ -5,7 +5,7 @@ import pageLoader from './';
 
 export default () => {
   app
-    .version('0.0.3')
+    .version('1.0.0')
     .arguments('<url>')
     .description('Download page to a current directory')
     .option('-o, --output [dir]', 'Output directory')
@@ -14,22 +14,22 @@ export default () => {
         const tasks = new Listr([
           {
             title: `Upload Page from ${url}`,
-            task: () =>
-              new Listr([
-                {
-                  title: 'Load assets',
-                  /*eslint-disable */
-                  task: ctx => pageLoader(url, app.output, ctx)
-                  .then(res => ctx.res = res)
-                    .then(() => ctx.assets.forEach(link => console.log(chalk.green(` ✔${' '.repeat(3)}${link}`)))),
-                  /*eslint-enable */
-                },
-              ]),
+            task: () => new Listr([
+              {
+                title: 'Load assets',
+                task: () => pageLoader(url, app.output)
+                  .then(results => new Listr(results.reduce((acc, result) => (
+                    [...acc, { title: `${result.url}`,
+                      task: () => result.loaded
+                               .then(() => console.log(chalk.green(` ✔${' '.repeat(3)}${result.url}`))) },
+                    ]), []))),
+              },
+            ]),
           },
         ]);
         return tasks.run()
-          .then((ctx) => {
-            console.log(chalk.green.bold(ctx.res));
+          .then(() => {
+            console.log(chalk.green.bold('Page successfully uploaded'));
             return process.exit(0);
           })
           .catch((e) => {
