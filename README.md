@@ -15,5 +15,5 @@ $ make link
 
 ```
 $ page-loader --output /var/tmp https://hexlet.io/courses
-$ open /var/tmp/hexlet-io-courses.html
+$ xdg-open /var/tmp/hexlet-io-courses.html
 ```
